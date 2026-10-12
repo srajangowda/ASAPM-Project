@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}EduPredict AI - Prediction Studio{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Student Prediction Studio</h1>
+            <p class="card-subtitle">Input student demographic and academic metrics to forecast expected mathematics examination performance.</p>
+        </div>
+
+        <!-- Quick Preset Buttons -->
+        <div class="preset-bar">
+            <span class="preset-title"><i class="bi bi-magic"></i> Quick Presets:</span>
+            <button type="button" class="preset-btn" data-preset="high">High Achiever</button>
+            <button type="button" class="preset-btn" data-preset="average">Average Profile</button>
+            <button type="button" class="preset-btn" data-preset="support">Needs Support</button>
+        </div>
+
+        <form id="predict-form" action="{{ url_for('form') }}" method="POST">
+            <!-- Section 1: Demographics -->
+            <div class="form-section">
+                <div class="section-legend">
+                    <i class="bi bi-person-badge"></i> 1. Demographic &amp; Background Profile
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="gender">Gender</label>
+                        <select name="gender" id="gender" class="form-select" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="ethnicity">Race / Ethnicity Group</label>
+                        <select name="ethnicity" id="ethnicity" class="form-select" required>
+                            <option value="">Select Group</option>
+                            <option value="group A">Group A</option>
+                            <option value="group B">Group B</option>
+                            <option value="group C">Group C</option>
+                            <option value="group D">Group D</option>
+                            <option value="group E">Group E</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="parental_level_of_education">Parental Level of Education</label>
+                    <select name="parental_level_of_education" id="parental_level_of_education" class="form-select" required>
+                        <option value="">Select Education Level</option>
+                        <option value="some high school">Some High School</option>
+                        <option value="high school">High School</option>
+                        <option value="some college">Some College</option>
+                        <option value="associate's degree">Associate's Degree</option>
+                        <option value="bachelor's degree">Bachelor's Degree</option>
+                        <option value="master's degree">Master's Degree</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section 2: Socio-Economic Factors -->
+            <div class="form-section">
+                <div class="section-legend">
+                    <i class="bi bi-card-checklist"></i> 2. Academic Support &amp; Nutrition
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="lunch">Lunch Subsidy Status</label>
+                        <select name="lunch" id="lunch" class="form-select" required>
+                            <option value="">Select Status</option>
+                            <option value="standard">Standard Lunch</option>
+                            <option value="free/reduced">Free / Reduced Lunch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="test_preparation_course">Test Preparation Course</label>
+                        <select name="test_preparation_course" id="test_preparation_course" class="form-select" required>
+                            <option value="">Select Status</option>
+                            <option value="none">None (Incomplete)</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Assessment Metrics -->
+            <div class="form-section">
+                <div class="section-legend">
+                    <i class="bi bi-graph-up-arrow"></i> 3. Prior Academic Scores (0 - 100)
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="reading_score">Reading Assessment Score</label>
+                    <div class="slider-container">
+                        <input type="range" id="reading_range" class="score-range" min="0" max="100" value="70">
+                        <input type="number" id="reading_score" name="reading_score" class="form-control score-number" min="0" max="100" value="70" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="writing_score">Writing Assessment Score</label>
+                    <div class="slider-container">
+                        <input type="range" id="writing_range" class="score-range" min="0" max="100" value="70">
+                        <input type="number" id="writing_score" name="writing_score" class="form-control score-number" min="0" max="100" value="70" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-block">
+                <i class="bi bi-lightning-charge-fill"></i> Generate Math Performance Prediction
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

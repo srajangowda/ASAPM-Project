@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}EduPredict AI - Prediction Analysis{% endblock %}
+
+{% block content %}
+<div class="result-wrapper">
+    <div class="result-card">
+        {% if results is defined and results is not none %}
+            <!-- Performance Tier Badge -->
+            {% if results >= 85 %}
+                <div class="result-badge badge-excellent">
+                    <i class="bi bi-award-fill"></i> Outstanding Mastery (Grade A)
+                </div>
+            {% elif results >= 70 %}
+                <div class="result-badge badge-good">
+                    <i class="bi bi-star-fill"></i> Strong Performance (Grade B)
+                </div>
+            {% elif results >= 50 %}
+                <div class="result-badge badge-average">
+                    <i class="bi bi-check-circle-fill"></i> Satisfactory Performance (Grade C)
+                </div>
+            {% else %}
+                <div class="result-badge badge-needs-help">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Academic Support Recommended
+                </div>
+            {% endif %}
+
+            <!-- Score Display Circle -->
+            <div class="score-display-wrapper">
+                <div class="score-circle">
+                    <div class="score-number-big">{{ results }}</div>
+                    <div class="score-max">out of 100</div>
+                </div>
+            </div>
+
+            <h2 class="result-summary-title">Predicted Mathematics Score</h2>
+            <p class="result-summary-desc">
+                Machine learning inference calculated using your multi-factor regression ensemble based on demographic and academic correlation weights.
+            </p>
+
+            <!-- Subject Assessment Comparison -->
+            {% if student %}
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <span class="comp-label">Reading Assessment</span>
+                    <span class="comp-value">{{ student.reading_score }}</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comp-label">Writing Assessment</span>
+                    <span class="comp-value">{{ student.writing_score }}</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comp-label">Predicted Math Score</span>
+                    <span class="comp-value predicted">{{ results }}</span>
+                </div>
+            </div>
+
+            <!-- Actionable AI Recommendations -->
+            <div class="insights-box">
+                <div class="insights-header">
+                    <i class="bi bi-lightbulb-fill"></i> Personalized Academic Recommendations
+                </div>
+                <ul class="insights-list">
+                    {% if student.test_prep == 'none' %}
+                    <li>
+                        <i class="bi bi-arrow-up-right-circle"></i>
+                        <span><strong>Test Preparation Course:</strong> Completing structured test prep typically provides an estimated <strong>+5 to +8 point boost</strong> in math examination confidence.</span>
+                    </li>
+                    {% else %}
+                    <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span><strong>Course Preparedness:</strong> Completed test preparation course contributes positively to test endurance and retention.</span>
+                    </li>
+                    {% endif %}
+
+                    {% if student.reading_score > results %}
+                    <li>
+                        <i class="bi bi-arrow-right-circle"></i>
+                        <span><strong>Reading vs. Math Synergy:</strong> Strong verbal comprehension skills can be leveraged into structured math word-problem mastery.</span>
+                    </li>
+                    {% endif %}
+
+                    {% if student.lunch == 'free/reduced' %}
+                    <li>
+                        <i class="bi bi-info-circle"></i>
+                        <span><strong>Academic Resource Support:</strong> Recommend connecting student with peer tutoring and STEM workshop access.</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Navigation Actions -->
+            <div class="hero-actions" style="margin-bottom: 0;">
+                <a href="{{ url_for('form') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-repeat"></i> Predict Another Student
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="bi bi-house"></i> Back to Overview
+                </a>
+            </div>
+
+        {% else %}
+            <!-- Empty State if /result is opened directly -->
+            <div style="padding: 40px 0;">
+                <div class="feature-icon" style="margin: 0 auto 20px;">
+                    <i class="bi bi-clipboard2-data"></i>
+                </div>
+                <h2 class="card-title">No Active Prediction Record</h2>
+                <p class="card-subtitle" style="margin-bottom: 30px;">
+                    Please input a student's parameters in the Prediction Studio to generate an AI performance assessment.
+                </p>
+                <a href="{{ url_for('form') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle-fill"></i> Go to Prediction Studio
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

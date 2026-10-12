@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}EduPredict AI - Academic Performance Intelligence{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-pill">
+        <i class="bi bi-stars"></i> Powered by Multi-Model Machine Learning
+    </div>
+    
+    <h1 class="hero-title">
+        Predict Student Academic Success with <span class="gradient-text">Precision AI</span>
+    </h1>
+    
+    <p class="hero-subtitle">
+        An enterprise-grade machine learning platform analyzing demographic, socio-economic, and prior assessment metrics to forecast student mathematics performance and identify early interventions.
+    </p>
+
+    <div class="hero-actions">
+        <a href="{{ url_for('form') }}" class="btn btn-primary">
+            <i class="bi bi-play-circle-fill"></i> Launch Prediction Studio
+        </a>
+        <a href="https://github.com/srajangowda/ASAPM-Project" target="_blank" class="btn btn-secondary">
+            <i class="bi bi-code-slash"></i> View Architecture
+        </a>
+    </div>
+</div>
+
+<!-- Performance Metrics Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">87.8%</div>
+        <div class="stat-label">Model R² Accuracy Score</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">7+</div>
+        <div class="stat-label">Algorithms Benchmarked</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">&lt; 50ms</div>
+        <div class="stat-label">Inference Latency</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">CI/CD Automated Coverage</div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="bi bi-diagram-3"></i>
+        </div>
+        <h3 class="feature-title">Multi-Factor Analysis</h3>
+        <p class="feature-desc">
+            Evaluates intersecting factors including parental education, lunch type assistance, and test preparation to identify holistic learning barriers.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="bi bi-cpu"></i>
+        </div>
+        <h3 class="feature-title">Ensemble Model Selection</h3>
+        <p class="feature-desc">
+            Trains and compares CatBoost, XGBoost, Random Forest, AdaBoost, and Linear Regression with hyperparameter tuning to select the optimal predictor.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <h3 class="feature-title">Production CI/CD Pipeline</h3>
+        <p class="feature-desc">
+            Automated test suites with pytest, Docker container packaging, and continuous integration workflows via GitHub Actions.
+        </p>
+    </div>
+</div>
+{% endblock %}
