@@ -332,3 +332,4 @@ http://<YOUR-EC2-PUBLIC-IP>:5000/
 > [!WARNING]
 > **Issue: EC2 IP changes on reboot**
 > By default, AWS EC2 public IPv4 addresses change when instances stop and start. Allocate an **Elastic IP** in AWS (EC2 > Elastic IPs) and associate it with your EC2 instance so your GitHub webhook URL and app URL remain permanent.
+
