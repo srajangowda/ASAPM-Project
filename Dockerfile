@@ -1,14 +1,15 @@
 FROM python:3.12-slim
 
-RUN apt update -y && apt install awscli -y
 WORKDIR /app
 
-COPY . /app
+# Copy requirements first to leverage Docker layer caching
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r requirements.txt
-RUN pip install --upgrade accelerate
+# Copy source code and artifacts
+COPY . /app
 
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["python3", "app.py"]
+CMD ["python3", "app.py"]
