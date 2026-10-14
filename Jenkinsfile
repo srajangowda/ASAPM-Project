@@ -17,32 +17,21 @@ pipeline {
             }
         }
 
-        stage('Set Up Environment & Run Tests') {
-            steps {
-                echo '=== Stage 2: Installing dependencies and running pytest ==='
-                sh '''
-                    # Create isolated Python virtual environment for test runner
-                    python3 -m venv venv_ci
-                    . venv_ci/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    
-                    # Run automated unit & integration tests
-                    pytest -v
-                    
-                    # Deactivate virtual environment
-                    deactivate
-                    rm -rf venv_ci
-                '''
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                echo '=== Stage 3: Building Docker container image ==='
+                echo '=== Stage 2: Building Docker container image ==='
                 sh """
                     docker build -t ${IMAGE_TAG} .
                     docker tag ${IMAGE_TAG} ${LATEST_TAG}
+                """
+            }
+        }
+
+        stage('Run Tests inside Container') {
+            steps {
+                echo '=== Stage 3: Running pytest inside Docker container ==='
+                sh """
+                    docker run --rm ${LATEST_TAG} pytest -v
                 """
             }
         }
