@@ -11,6 +11,12 @@ def test_home_page(client):
     response = client.get('/')
     assert response.status_code == 200
 
+def test_dashboard_page(client):
+    response = client.get('/dashboard')
+    assert response.status_code == 200
+    assert "Faculty Dashboard" in response.get_data(as_text=True)
+    assert "Prof. Srajan Gowda" in response.get_data(as_text=True)
+
 def test_form_page_get(client):
     response = client.get('/form')
     assert response.status_code == 200

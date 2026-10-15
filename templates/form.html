@@ -31,7 +31,7 @@
                         data-cn="{{ s.computer_networks }}"
                         data-daa="{{ s.design_analysis_algo }}"
                         data-se="{{ s.software_engineering }}"
-                        {% if loop.first %}selected{% endif %}>
+                        {% if selected_student and selected_student == s.student_name %}selected{% elif not selected_student and loop.first %}selected{% endif %}>
                     {{ s.student_name }} &mdash; USN: {{ s.usn }} (Attendance: {{ s.attendance_percentage }}%)
                 </option>
                 {% endfor %}

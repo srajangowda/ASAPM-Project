@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Dashboard - Department of Computer Science & Engineering{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Faculty Profile Header Card -->
+    <div class="card" style="margin-bottom: 28px; padding: 30px; background: linear-gradient(135deg, #ffffff, #f8fafc);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">
+                        Faculty Academic Advisory Desk
+                    </span>
+                    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--dark); margin: 2px 0;">
+                        {{ faculty.name }}
+                    </h1>
+                    <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 4px;">
+                        {{ faculty.title }} &bull; <strong>{{ faculty.department }}</strong>
+                    </p>
+                    <div style="font-size: 0.85rem; color: var(--slate); display: flex; gap: 16px; flex-wrap: wrap;">
+                        <span><i class="bi bi-envelope"></i> {{ faculty.email }}</span>
+                        <span><i class="bi bi-geo-alt"></i> {{ faculty.office }}</span>
+                        <span><i class="bi bi-calendar3"></i> {{ faculty.term }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <a href="{{ url_for('form') }}" class="btn btn-primary" style="padding: 12px 24px;">
+                    <i class="bi bi-person-check-fill"></i> Launch Assessment Studio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Performance KPI Cards -->
+    <div class="stats-grid" style="margin-bottom: 36px;">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_students }}</div>
+            <div class="stat-label">Total Assigned Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--secondary);">{{ stats.class_avg }}%</div>
+            <div class="stat-label">Batch Cumulative Average</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #16a34a;">{{ stats.distinction_count }}</div>
+            <div class="stat-label">Distinction Candidates (&ge;85%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #dc2626;">{{ stats.at_risk_count }}</div>
+            <div class="stat-label">Academic Risk Alerts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #4f46e5;">{{ stats.attendance_avg }}%</div>
+            <div class="stat-label">Batch Average Attendance</div>
+        </div>
+    </div>
+
+    <!-- Student Roster Management Table -->
+    <div class="card" style="padding: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 4px;">
+                    <i class="bi bi-people-fill" style="color: var(--primary);"></i> Student Mentorship Batch Roster
+                </h2>
+                <p style="color: var(--muted); font-size: 0.9rem;">
+                    Coursework history across 10 engineering subjects in Semesters 3 &amp; 4. Click <strong>Assess</strong> to run AI performance forecasts.
+                </p>
+            </div>
+
+            <!-- Instant Search Input -->
+            <div style="position: relative; width: 320px; max-width: 100%;">
+                <input type="text" id="rosterSearch" placeholder="Search student name or USN..." 
+                       style="width: 100%; padding: 10px 16px 10px 38px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem;">
+                <i class="bi bi-search" style="position: absolute; left: 14px; top: 12px; color: var(--muted);"></i>
+            </div>
+        </div>
+
+        <!-- Filter Status Pills -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button type="button" class="filter-pill active-pill" onclick="filterRoster('all', this)">All Students ({{ students|length }})</button>
+            <button type="button" class="filter-pill" onclick="filterRoster('Distinction', this)">Distinction (&ge;85%)</button>
+            <button type="button" class="filter-pill" onclick="filterRoster('Good Standing', this)">Good Standing</button>
+            <button type="button" class="filter-pill" onclick="filterRoster('Academic Risk', this)">Academic Risk (<75% Attn / <50%)</button>
+        </div>
+
+        <!-- Table Container -->
+        <div style="overflow-x: auto;">
+            <table id="rosterTable" style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">#</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Student Name</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">USN</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Attendance</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Sem 3 Avg</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Sem 4 Avg</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Past Avg</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700;">Academic Status</th>
+                        <th style="padding: 12px 16px; color: var(--slate); font-weight: 700; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr class="roster-row" data-status="{{ s.academic_status }}" style="border-bottom: 1px solid var(--border); transition: background 0.15s ease;">
+                        <td style="padding: 14px 16px; color: var(--muted); font-weight: 600;">{{ loop.index }}</td>
+                        <td style="padding: 14px 16px; font-weight: 700; color: var(--dark);">
+                            {{ s.student_name }}
+                        </td>
+                        <td style="padding: 14px 16px; font-weight: 600; color: var(--primary);">
+                            {{ s.usn }}
+                        </td>
+                        <td style="padding: 14px 16px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; {% if s.attendance_percentage < 75 %}background: #fee2e2; color: #b91c1c;{% else %}background: #dcfce7; color: #166534;{% endif %}">
+                                {{ s.attendance_percentage }}%
+                            </span>
+                        </td>
+                        <td style="padding: 14px 16px; color: var(--slate); font-weight: 600;">{{ s.sem3_avg }}</td>
+                        <td style="padding: 14px 16px; color: var(--slate); font-weight: 600;">{{ s.sem4_avg }}</td>
+                        <td style="padding: 14px 16px; font-weight: 800; color: var(--dark);">{{ s.overall_avg }}</td>
+                        <td style="padding: 14px 16px;">
+                            <span class="result-badge {{ s.status_badge }}" style="margin-bottom: 0; padding: 4px 12px; font-size: 0.8rem;">
+                                {{ s.academic_status }}
+                            </span>
+                        </td>
+                        <td style="padding: 14px 16px; text-align: right;">
+                            <a href="{{ url_for('form') }}?student={{ s.student_name }}" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem; border-radius: 8px;">
+                                <i class="bi bi-play-circle"></i> Assess
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.filter-pill {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--slate);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.filter-pill:hover, .filter-pill.active-pill {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.roster-row:hover {
+    background: #f8fafc;
+}
+</style>
+
+<script>
+// Filter by status tab
+function filterRoster(status, btn) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active-pill'));
+    btn.classList.add('active-pill');
+
+    const rows = document.querySelectorAll('.roster-row');
+    rows.forEach(row => {
+        if (status === 'all' || row.getAttribute('data-status') === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Live Search Input
+document.getElementById('rosterSearch')?.addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.roster-row');
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(q)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -10,28 +10,92 @@ app = Flask(__name__)
 DATA_PATH = os.path.join("notebook", "data", "stud.csv")
 
 def get_student_roster():
-    """Load the student list and historical marks from the dataset."""
+    """Load the student list and historical marks from the dataset with computed metrics."""
     try:
         if os.path.exists(DATA_PATH):
             df = pd.read_csv(DATA_PATH)
         else:
             df = pd.read_csv(os.path.join("artifacts", "raw.csv"))
-        return df.to_dict(orient="records")
+
+        records = df.to_dict(orient="records")
+        for s in records:
+            sem3 = (float(s.get('eng_math_3', 0)) + float(s.get('data_structures', 0)) +
+                    float(s.get('digital_logic', 0)) + float(s.get('oop_java', 0)) +
+                    float(s.get('discrete_math', 0))) / 5.0
+            sem4 = (float(s.get('dbms', 0)) + float(s.get('operating_systems', 0)) +
+                    float(s.get('computer_networks', 0)) + float(s.get('design_analysis_algo', 0)) +
+                    float(s.get('software_engineering', 0))) / 5.0
+            overall = (sem3 + sem4) / 2.0
+            att = float(s.get('attendance_percentage', 0))
+
+            s['sem3_avg'] = round(sem3, 1)
+            s['sem4_avg'] = round(sem4, 1)
+            s['overall_avg'] = round(overall, 1)
+
+            if att < 75.0 or overall < 50.0:
+                s['academic_status'] = "Academic Risk"
+                s['status_badge'] = "badge-needs-help"
+            elif overall >= 85.0:
+                s['academic_status'] = "Distinction"
+                s['status_badge'] = "badge-excellent"
+            else:
+                s['academic_status'] = "Good Standing"
+                s['status_badge'] = "badge-good"
+
+        return records
     except Exception as e:
         print(f"Error loading student roster: {e}")
         return []
 
-# Home page / Faculty Portal Overview
+# 1. Landing Page / Overview
 @app.route('/')
 @app.route('/home')
 def index():
     students = get_student_roster()
     return render_template('index.html', total_students=len(students))
 
-# Form page - Student Selection & Performance Assessment
+# 2. Dedicated Faculty Dashboard
+@app.route('/dashboard')
+def dashboard():
+    students = get_student_roster()
+    
+    total = len(students)
+    if total > 0:
+        class_avg = round(sum(s['overall_avg'] for s in students) / total, 1)
+        distinction_count = sum(1 for s in students if s['overall_avg'] >= 85.0)
+        at_risk_count = sum(1 for s in students if s['academic_status'] == "Academic Risk")
+        attendance_avg = round(sum(s.get('attendance_percentage', 0) for s in students) / total, 1)
+    else:
+        class_avg = 0.0
+        distinction_count = 0
+        at_risk_count = 0
+        attendance_avg = 0.0
+
+    faculty = {
+        "name": "Prof. Srajan Gowda",
+        "title": "Associate Professor & Senior Academic Mentor",
+        "department": "Department of Computer Science & Engineering",
+        "email": "srajan.gowda@engg.edu",
+        "office": "Room 408, CS Academic Block",
+        "course": "B.Tech CSE Batch 2022-26",
+        "term": "Academic Year 2025–26 (Semesters III & IV Review)"
+    }
+
+    stats = {
+        "total_students": total,
+        "class_avg": class_avg,
+        "distinction_count": distinction_count,
+        "at_risk_count": at_risk_count,
+        "attendance_avg": attendance_avg
+    }
+
+    return render_template('dashboard.html', faculty=faculty, stats=stats, students=students)
+
+# 3. Form Page - Student Selection & Performance Assessment Studio
 @app.route('/form', methods=['GET', 'POST'])
 def form():
     students = get_student_roster()
+    selected_student = request.args.get('student', '')
 
     if request.method == 'POST':
         student_name = request.form.get('student_name', 'Student')
@@ -145,7 +209,7 @@ def form():
 
         return render_template('result.html', report=student_report, results=predicted_score)
 
-    return render_template('form.html', students=students)
+    return render_template('form.html', students=students, selected_student=selected_student)
 
 # Direct Result page fallback
 @app.route('/result')
