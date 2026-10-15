@@ -1,113 +1,114 @@
 // =========================================================
-// EduPredict AI - Interactive Client Scripts
+// Faculty Portal - Student Performance Predictor Scripts
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Sync score sliders and number input fields
-    setupScoreSync("reading_score", "reading_range");
-    setupScoreSync("writing_score", "writing_range");
+    // 1. Setup Student Selection Dropdown Auto-Fill
+    setupStudentSelector();
 
-    // 2. Preset Quick Fill Buttons
-    setupPresets();
+    // 2. Setup Attendance Slider Sync
+    setupAttendanceSync();
 
-    // 3. Form submit loading state
+    // 3. Form Submission Feedback
     const form = document.querySelector("#predict-form");
     if (form) {
         form.addEventListener("submit", (e) => {
             const submitBtn = form.querySelector("#submit-btn");
             if (submitBtn) {
-                submitBtn.innerHTML = `<span class="spinner"></span> Generating AI Prediction...`;
+                submitBtn.innerHTML = `<span class="spinner"></span> Running Machine Learning Evaluation...`;
                 submitBtn.disabled = true;
-                // Allow form submit to proceed
                 form.submit();
             }
         });
     }
 });
 
-function setupScoreSync(numberId, rangeId) {
-    const numInput = document.getElementById(numberId);
-    const rangeInput = document.getElementById(rangeId);
+function setupStudentSelector() {
+    const selector = document.getElementById("student_select");
+    if (!selector) return;
 
-    if (!numInput || !rangeInput) return;
+    // Trigger on change
+    selector.addEventListener("change", (e) => {
+        const option = selector.options[selector.selectedIndex];
+        if (!option || !option.value) return;
 
-    // Range changes number
-    rangeInput.addEventListener("input", (e) => {
-        numInput.value = e.target.value;
+        const name = option.getAttribute("data-name") || option.value;
+        const usn = option.getAttribute("data-usn") || "";
+        const att = option.getAttribute("data-att") || "85";
+
+        // Display Header Banner
+        const displayName = document.getElementById("display-name");
+        const displayUsn = document.getElementById("display-usn");
+        const displayAttBadge = document.getElementById("display-att-badge");
+
+        if (displayName) displayName.innerText = name;
+        if (displayUsn) displayUsn.innerText = "USN: " + usn;
+        if (displayAttBadge) {
+            displayAttBadge.innerText = parseFloat(att).toFixed(1) + "%";
+            if (parseFloat(att) < 75) {
+                displayAttBadge.style.color = "#b91c1c";
+                displayAttBadge.style.background = "#fee2e2";
+            } else {
+                displayAttBadge.style.color = "#166534";
+                displayAttBadge.style.background = "#dcfce7";
+            }
+        }
+
+        // Hidden Inputs
+        const studentNameInput = document.getElementById("student_name");
+        const usnInput = document.getElementById("usn");
+        if (studentNameInput) studentNameInput.value = name;
+        if (usnInput) usnInput.value = usn;
+
+        // Attendance
+        setFieldValue("attendance_percentage", att);
+        setFieldValue("attendance_range", att);
+
+        // Semester 3 Marks
+        setFieldValue("eng_math_3", option.getAttribute("data-em3"));
+        setFieldValue("data_structures", option.getAttribute("data-ds"));
+        setFieldValue("digital_logic", option.getAttribute("data-dl"));
+        setFieldValue("oop_java", option.getAttribute("data-oop"));
+        setFieldValue("discrete_math", option.getAttribute("data-dm"));
+
+        // Semester 4 Marks
+        setFieldValue("dbms", option.getAttribute("data-dbms"));
+        setFieldValue("operating_systems", option.getAttribute("data-os"));
+        setFieldValue("computer_networks", option.getAttribute("data-cn"));
+        setFieldValue("design_analysis_algo", option.getAttribute("data-daa"));
+        setFieldValue("software_engineering", option.getAttribute("data-se"));
     });
 
-    // Number changes range
-    numInput.addEventListener("input", (e) => {
-        let val = parseInt(e.target.value, 10);
+    // Fire initially to populate first selected student
+    if (selector.selectedIndex >= 0) {
+        selector.dispatchEvent(new Event('change'));
+    }
+}
+
+function setFieldValue(id, val) {
+    const el = document.getElementById(id);
+    if (el && val !== null && val !== undefined) {
+        el.value = parseFloat(val).toFixed(1);
+    }
+}
+
+function setupAttendanceSync() {
+    const num = document.getElementById("attendance_percentage");
+    const range = document.getElementById("attendance_range");
+    const badge = document.getElementById("display-att-badge");
+
+    if (!num || !range) return;
+
+    range.addEventListener("input", (e) => {
+        num.value = parseFloat(e.target.value).toFixed(1);
+        if (badge) badge.innerText = num.value + "%";
+    });
+
+    num.addEventListener("input", (e) => {
+        let val = parseFloat(e.target.value);
         if (isNaN(val)) val = 0;
         if (val > 100) val = 100;
-        if (val < 0) val = 0;
-        rangeInput.value = val;
+        range.value = val;
+        if (badge) badge.innerText = val.toFixed(1) + "%";
     });
-}
-
-function setupPresets() {
-    const presets = {
-        high: {
-            gender: "female",
-            ethnicity: "group C",
-            parental_level_of_education: "master's degree",
-            lunch: "standard",
-            test_preparation_course: "completed",
-            reading_score: 92,
-            writing_score: 95
-        },
-        average: {
-            gender: "male",
-            ethnicity: "group B",
-            parental_level_of_education: "some college",
-            lunch: "standard",
-            test_preparation_course: "none",
-            reading_score: 70,
-            writing_score: 68
-        },
-        support: {
-            gender: "male",
-            ethnicity: "group A",
-            parental_level_of_education: "high school",
-            lunch: "free/reduced",
-            test_preparation_course: "none",
-            reading_score: 45,
-            writing_score: 42
-        }
-    };
-
-    document.querySelectorAll(".preset-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const type = btn.getAttribute("data-preset");
-            const data = presets[type];
-            if (!data) return;
-
-            // Fill form fields
-            setVal("gender", data.gender);
-            setVal("ethnicity", data.ethnicity);
-            setVal("parental_level_of_education", data.parental_level_of_education);
-            setVal("lunch", data.lunch);
-            setVal("test_preparation_course", data.test_preparation_course);
-
-            setScore("reading_score", "reading_range", data.reading_score);
-            setScore("writing_score", "writing_range", data.writing_score);
-
-            // Highlight preset button
-            document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active-preset"));
-            btn.classList.add("active-preset");
-        });
-    });
-}
-
-function setVal(name, value) {
-    const el = document.querySelector(`[name="${name}"]`);
-    if (el) el.value = value;
-}
-
-function setScore(numId, rangeId, val) {
-    const num = document.getElementById(numId);
-    const range = document.getElementById(rangeId);
-    if (num) num.value = val;
-    if (range) range.value = val;
 }

@@ -1,79 +1,114 @@
 {% extends 'base.html' %}
-{% block title %}EduPredict AI - Academic Performance Intelligence{% endblock %}
+{% block title %}Faculty Portal - Engineering Student Academic Analytics{% endblock %}
 
 {% block content %}
 <div class="hero">
     <div class="hero-pill">
-        <i class="bi bi-stars"></i> Powered by Multi-Model Machine Learning
+        <i class="bi bi-mortarboard"></i> Department of Computer Science &amp; Engineering
     </div>
     
     <h1 class="hero-title">
-        Predict Student Academic Success with <span class="gradient-text">Precision AI</span>
+        Faculty Academic <span class="gradient-text">Performance Predictor</span>
     </h1>
     
     <p class="hero-subtitle">
-        An enterprise-grade machine learning platform analyzing demographic, socio-economic, and prior assessment metrics to forecast student mathematics performance and identify early interventions.
+        An intelligent decision-support portal for engineering faculty. Select any student to instantly retrieve their past 2 semesters of coursework (10+ core subjects) and forecast their upcoming academic performance with machine learning.
     </p>
 
     <div class="hero-actions">
         <a href="{{ url_for('form') }}" class="btn btn-primary">
-            <i class="bi bi-play-circle-fill"></i> Launch Prediction Studio
+            <i class="bi bi-person-bounding-box"></i> Assess Student Performance
         </a>
         <a href="https://github.com/srajangowda/ASAPM-Project" target="_blank" class="btn btn-secondary">
-            <i class="bi bi-code-slash"></i> View Architecture
+            <i class="bi bi-github"></i> View Model Architecture
         </a>
     </div>
 </div>
 
-<!-- Performance Metrics Grid -->
+<!-- Department Stats Grid -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-value">87.8%</div>
+        <div class="stat-value">{{ total_students if total_students else 25 }}+</div>
+        <div class="stat-label">Students in Batch Roster</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">10</div>
+        <div class="stat-label">Core Engineering Subjects</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">Sem 3 &amp; 4</div>
+        <div class="stat-label">Evaluated Academic History</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">99.6%</div>
         <div class="stat-label">Model R² Accuracy Score</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">7+</div>
-        <div class="stat-label">Algorithms Benchmarked</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">&lt; 50ms</div>
-        <div class="stat-label">Inference Latency</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">100%</div>
-        <div class="stat-label">CI/CD Automated Coverage</div>
     </div>
 </div>
 
-<!-- Features Section -->
+<!-- Core Engineering Curriculum Breakdown -->
+<div class="card" style="margin: 40px 0; padding: 32px;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: var(--dark);">
+        <i class="bi bi-journal-bookmark-fill" style="color: var(--primary);"></i> Tracked Engineering Subjects (Last 2 Semesters)
+    </h2>
+
+    <div class="form-grid-2">
+        <div style="background: #f8fafc; padding: 20px; border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 10px;">
+                Semester 3 Core Subjects
+            </h3>
+            <ul style="padding-left: 20px; color: var(--slate); font-size: 0.95rem; line-height: 1.8;">
+                <li>Engineering Mathematics III (Fourier &amp; Linear Algebra)</li>
+                <li>Data Structures &amp; Algorithms</li>
+                <li>Digital Logic Design &amp; Architecture</li>
+                <li>Object-Oriented Programming (Java/C++)</li>
+                <li>Discrete Mathematical Structures</li>
+            </ul>
+        </div>
+
+        <div style="background: #f8fafc; padding: 20px; border-radius: var(--radius-md); border-left: 4px solid var(--secondary);">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 10px;">
+                Semester 4 Core Subjects
+            </h3>
+            <ul style="padding-left: 20px; color: var(--slate); font-size: 0.95rem; line-height: 1.8;">
+                <li>Database Management Systems (DBMS)</li>
+                <li>Operating Systems &amp; Systems Programming</li>
+                <li>Computer Networks &amp; Protocols</li>
+                <li>Design and Analysis of Algorithms (DAA)</li>
+                <li>Software Engineering &amp; Agile Methodology</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Faculty Benefits -->
 <div class="features-grid">
     <div class="feature-card">
         <div class="feature-icon">
-            <i class="bi bi-diagram-3"></i>
+            <i class="bi bi-search"></i>
         </div>
-        <h3 class="feature-title">Multi-Factor Analysis</h3>
+        <h3 class="feature-title">1-Click Student Profile Lookup</h3>
         <p class="feature-desc">
-            Evaluates intersecting factors including parental education, lunch type assistance, and test preparation to identify holistic learning barriers.
+            Faculty can choose any student from the class roster. All 10 past subject scores and attendance metrics load immediately.
         </p>
     </div>
 
     <div class="feature-card">
         <div class="feature-icon">
-            <i class="bi bi-cpu"></i>
+            <i class="bi bi-sliders"></i>
         </div>
-        <h3 class="feature-title">Ensemble Model Selection</h3>
+        <h3 class="feature-title">What-If Simulation Sandbox</h3>
         <p class="feature-desc">
-            Trains and compares CatBoost, XGBoost, Random Forest, AdaBoost, and Linear Regression with hyperparameter tuning to select the optimal predictor.
+            Easily adjust individual subject marks or attendance to simulate future outcome trajectories and intervention impact.
         </p>
     </div>
 
     <div class="feature-card">
         <div class="feature-icon">
-            <i class="bi bi-shield-check"></i>
+            <i class="bi bi-shield-exclamation"></i>
         </div>
-        <h3 class="feature-title">Production CI/CD Pipeline</h3>
+        <h3 class="feature-title">Early Remedial Identification</h3>
         <p class="feature-desc">
-            Automated test suites with pytest, Docker container packaging, and continuous integration workflows via GitHub Actions.
+            Automatically flags students at academic risk (&lt; 50%) and identifies specific subjects requiring mentoring sessions.
         </p>
     </div>
 </div>

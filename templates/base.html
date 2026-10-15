@@ -23,15 +23,15 @@
                 <div class="brand-icon">
                     <i class="bi bi-mortarboard-fill"></i>
                 </div>
-                <span>EduPredict <span class="brand-tag">ML v2.0</span></span>
+                <span>FacultyPortal <span class="brand-tag">Engineering ML</span></span>
             </a>
 
             <div class="nav-links">
                 <a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' or request.path == '/home' %}active{% endif %}">
-                    <i class="bi bi-house-door"></i> Overview
+                    <i class="bi bi-house-door"></i> Dashboard
                 </a>
                 <a href="{{ url_for('form') }}" class="nav-link {% if request.path == '/form' %}active{% endif %}">
-                    <i class="bi bi-sliders"></i> Prediction Studio
+                    <i class="bi bi-person-check-fill"></i> Student Assessment
                 </a>
                 <a href="https://github.com/srajangowda/ASAPM-Project" target="_blank" class="nav-link nav-cta">
                     <i class="bi bi-github"></i> GitHub Repository

@@ -1,116 +1,190 @@
 {% extends 'base.html' %}
-{% block title %}EduPredict AI - Prediction Analysis{% endblock %}
+{% block title %}Faculty Assessment Report - {{ report.name if report else 'Student Performance' }}{% endblock %}
 
 {% block content %}
 <div class="result-wrapper">
     <div class="result-card">
-        {% if results is defined and results is not none %}
-            <!-- Performance Tier Badge -->
-            {% if results >= 85 %}
-                <div class="result-badge badge-excellent">
-                    <i class="bi bi-award-fill"></i> Outstanding Mastery (Grade A)
+        {% if report %}
+            <!-- Student Header Banner -->
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 28px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; text-align: left;">
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Student Evaluation Report</span>
+                    <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--dark); margin: 2px 0;">{{ report.name }}</h1>
+                    <span style="font-size: 0.95rem; font-weight: 600; color: var(--primary);">USN: {{ report.usn }} &bull; Department of Computer Science &amp; Engineering</span>
                 </div>
-            {% elif results >= 70 %}
-                <div class="result-badge badge-good">
-                    <i class="bi bi-star-fill"></i> Strong Performance (Grade B)
+                <div style="text-align: right;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Recorded Attendance</span>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: {% if report.attendance < 75 %}#b91c1c{% else %}#166534{% endif %};">
+                        {{ report.attendance }}%
+                    </div>
                 </div>
-            {% elif results >= 50 %}
-                <div class="result-badge badge-average">
-                    <i class="bi bi-check-circle-fill"></i> Satisfactory Performance (Grade C)
-                </div>
-            {% else %}
-                <div class="result-badge badge-needs-help">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Academic Support Recommended
-                </div>
-            {% endif %}
+            </div>
 
-            <!-- Score Display Circle -->
+            <!-- Performance Tier Badge -->
+            <div class="result-badge {{ report.badge_class }}">
+                {% if report.predicted_score >= 85 %}
+                    <i class="bi bi-award-fill"></i> {{ report.tier }}
+                {% elif report.predicted_score >= 70 %}
+                    <i class="bi bi-star-fill"></i> {{ report.tier }}
+                {% elif report.predicted_score >= 50 %}
+                    <i class="bi bi-check-circle-fill"></i> {{ report.tier }}
+                {% else %}
+                    <i class="bi bi-exclamation-triangle-fill"></i> {{ report.tier }}
+                {% endif %}
+            </div>
+
+            <!-- Score Display Gauge -->
             <div class="score-display-wrapper">
                 <div class="score-circle">
-                    <div class="score-number-big">{{ results }}</div>
-                    <div class="score-max">out of 100</div>
+                    <div class="score-number-big">{{ report.predicted_score }}</div>
+                    <div class="score-max">Forecast Score / 100</div>
                 </div>
             </div>
 
-            <h2 class="result-summary-title">Predicted Mathematics Score</h2>
+            <h2 class="result-summary-title">Predicted Core Engineering Examination Performance</h2>
             <p class="result-summary-desc">
-                Machine learning inference calculated using your multi-factor regression ensemble based on demographic and academic correlation weights.
+                ML regression inference synthesized across 10 core engineering subjects from Semesters 3 &amp; 4 and historical attendance patterns.
             </p>
 
-            <!-- Subject Assessment Comparison -->
-            {% if student %}
-            <div class="comparison-grid">
+            <!-- 4-Metric Academic Summary Grid -->
+            <div class="comparison-grid" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="comparison-item">
-                    <span class="comp-label">Reading Assessment</span>
-                    <span class="comp-value">{{ student.reading_score }}</span>
+                    <span class="comp-label">Sem 3 Average</span>
+                    <span class="comp-value">{{ report.sem3_avg }}</span>
                 </div>
                 <div class="comparison-item">
-                    <span class="comp-label">Writing Assessment</span>
-                    <span class="comp-value">{{ student.writing_score }}</span>
+                    <span class="comp-label">Sem 4 Average</span>
+                    <span class="comp-value">{{ report.sem4_avg }}</span>
                 </div>
                 <div class="comparison-item">
-                    <span class="comp-label">Predicted Math Score</span>
-                    <span class="comp-value predicted">{{ results }}</span>
+                    <span class="comp-label">Overall Past Avg</span>
+                    <span class="comp-value">{{ report.past_avg }}</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comp-label">Predicted Score</span>
+                    <span class="comp-value predicted">{{ report.predicted_score }}</span>
                 </div>
             </div>
 
-            <!-- Actionable AI Recommendations -->
+            <!-- Strengths and Needs Attention Cards -->
+            <div class="form-grid-2" style="margin-bottom: 30px; text-align: left;">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 18px 22px;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #166534; text-transform: uppercase;">
+                        <i class="bi bi-star-fill" style="color: #16a34a;"></i> Key Academic Strength
+                    </div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #14532d; margin-top: 4px;">
+                        {{ report.strongest[0] }}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #15803d; font-weight: 600;">
+                        Score: {{ report.strongest[1] }} / 100
+                    </div>
+                </div>
+
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 18px 22px;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #9f1239; text-transform: uppercase;">
+                        <i class="bi bi-exclamation-circle-fill" style="color: #e11d48;"></i> Recommended Focus Area
+                    </div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #881337; margin-top: 4px;">
+                        {{ report.weakest[0] }}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #be123c; font-weight: 600;">
+                        Score: {{ report.weakest[1] }} / 100
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed 10-Subject Breakdown -->
+            <div class="card" style="padding: 24px; text-align: left; margin-bottom: 30px; background: #fafafa;">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 16px;">
+                    <i class="bi bi-table"></i> Complete Coursework Breakdown (Last 2 Semesters)
+                </h3>
+
+                <div class="form-grid-2">
+                    <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 10px;">Semester 3 Subjects</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                            {% for sub, mark in report.sem3_marks.items() %}
+                            <tr style="border-bottom: 1px solid #e2e8f0; height: 32px;">
+                                <td style="color: var(--slate); font-weight: 500;">{{ sub }}</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--dark);">{{ mark }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--secondary); margin-bottom: 10px;">Semester 4 Subjects</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                            {% for sub, mark in report.sem4_marks.items() %}
+                            <tr style="border-bottom: 1px solid #e2e8f0; height: 32px;">
+                                <td style="color: var(--slate); font-weight: 500;">{{ sub }}</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--dark);">{{ mark }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actionable Faculty Advisory Box -->
             <div class="insights-box">
                 <div class="insights-header">
-                    <i class="bi bi-lightbulb-fill"></i> Personalized Academic Recommendations
+                    <i class="bi bi-lightbulb-fill"></i> Faculty Advisory &amp; Action Plan
                 </div>
                 <ul class="insights-list">
-                    {% if student.test_prep == 'none' %}
                     <li>
-                        <i class="bi bi-arrow-up-right-circle"></i>
-                        <span><strong>Test Preparation Course:</strong> Completing structured test prep typically provides an estimated <strong>+5 to +8 point boost</strong> in math examination confidence.</span>
+                        <i class="bi bi-check2-circle"></i>
+                        <span><strong>Academic Status:</strong> Student shows an overall academic baseline of <strong>{{ report.past_avg }}%</strong> with forecasted performance of <strong>{{ report.predicted_score }}%</strong>.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-tools"></i>
+                        <span><strong>Targeted Remedial Support:</strong> Recommend scheduling special tutorial sessions focusing on <strong>{{ report.weakest[0] }}</strong> (Current mark: {{ report.weakest[1] }}).</span>
+                    </li>
+                    {% if report.attendance < 75 %}
+                    <li style="color: #b91c1c;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span><strong>Attendance Alert:</strong> Recorded attendance is <strong>{{ report.attendance }}%</strong>, which is below the mandatory 75% threshold. Recommend issuing student academic warning.</span>
                     </li>
                     {% else %}
                     <li>
-                        <i class="bi bi-check2-circle"></i>
-                        <span><strong>Course Preparedness:</strong> Completed test preparation course contributes positively to test endurance and retention.</span>
+                        <i class="bi bi-award"></i>
+                        <span><strong>Attendance Compliance:</strong> Student maintains satisfactory lecture and lab attendance of <strong>{{ report.attendance }}%</strong>.</span>
                     </li>
                     {% endif %}
-
-                    {% if student.reading_score > results %}
+                    {% if report.predicted_score >= 85 %}
                     <li>
-                        <i class="bi bi-arrow-right-circle"></i>
-                        <span><strong>Reading vs. Math Synergy:</strong> Strong verbal comprehension skills can be leveraged into structured math word-problem mastery.</span>
-                    </li>
-                    {% endif %}
-
-                    {% if student.lunch == 'free/reduced' %}
-                    <li>
-                        <i class="bi bi-info-circle"></i>
-                        <span><strong>Academic Resource Support:</strong> Recommend connecting student with peer tutoring and STEM workshop access.</span>
+                        <i class="bi bi-star"></i>
+                        <span><strong>Honors &amp; Placement Recommendation:</strong> Student is a prime candidate for fast-track placement training and research project mentorship.</span>
                     </li>
                     {% endif %}
                 </ul>
             </div>
-            {% endif %}
 
             <!-- Navigation Actions -->
             <div class="hero-actions" style="margin-bottom: 0;">
                 <a href="{{ url_for('form') }}" class="btn btn-primary">
-                    <i class="bi bi-arrow-repeat"></i> Predict Another Student
+                    <i class="bi bi-people-fill"></i> Assess Another Student
                 </a>
+                <button type="button" onclick="window.print()" class="btn btn-secondary">
+                    <i class="bi bi-printer"></i> Print Evaluation Report
+                </button>
                 <a href="{{ url_for('index') }}" class="btn btn-secondary">
-                    <i class="bi bi-house"></i> Back to Overview
+                    <i class="bi bi-house"></i> Faculty Dashboard
                 </a>
             </div>
 
         {% else %}
-            <!-- Empty State if /result is opened directly -->
+            <!-- Fallback if visited directly -->
             <div style="padding: 40px 0;">
                 <div class="feature-icon" style="margin: 0 auto 20px;">
-                    <i class="bi bi-clipboard2-data"></i>
+                    <i class="bi bi-person-x"></i>
                 </div>
-                <h2 class="card-title">No Active Prediction Record</h2>
+                <h2 class="card-title">No Student Assessment Selected</h2>
                 <p class="card-subtitle" style="margin-bottom: 30px;">
-                    Please input a student's parameters in the Prediction Studio to generate an AI performance assessment.
+                    Please select a student from the department roster to view their comprehensive academic evaluation and forecast report.
                 </p>
                 <a href="{{ url_for('form') }}" class="btn btn-primary">
-                    <i class="bi bi-arrow-right-circle-fill"></i> Go to Prediction Studio
+                    <i class="bi bi-person-check-fill"></i> Go to Student Assessment Studio
                 </a>
             </div>
         {% endif %}

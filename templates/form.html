@@ -1,119 +1,152 @@
 {% extends 'base.html' %}
-{% block title %}EduPredict AI - Prediction Studio{% endblock %}
+{% block title %}Faculty Assessment Studio - Student Performance Predictor{% endblock %}
 
 {% block content %}
 <div class="form-wrapper">
     <div class="card">
         <div class="card-header">
-            <h1 class="card-title">Student Prediction Studio</h1>
-            <p class="card-subtitle">Input student demographic and academic metrics to forecast expected mathematics examination performance.</p>
+            <h1 class="card-title">Engineering Student Assessment Studio</h1>
+            <p class="card-subtitle">Select a student from the department roster to retrieve their last 2 semesters of coursework (10 core engineering subjects) and forecast upcoming semester performance.</p>
         </div>
 
-        <!-- Quick Preset Buttons -->
-        <div class="preset-bar">
-            <span class="preset-title"><i class="bi bi-magic"></i> Quick Presets:</span>
-            <button type="button" class="preset-btn" data-preset="high">High Achiever</button>
-            <button type="button" class="preset-btn" data-preset="average">Average Profile</button>
-            <button type="button" class="preset-btn" data-preset="support">Needs Support</button>
+        <!-- Student Selection Dropdown -->
+        <div style="background: linear-gradient(135deg, #f0f4ff, #e0e7ff); border: 1.5px solid var(--primary); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 28px;">
+            <label class="form-label" for="student_select" style="font-size: 1.05rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-person-lines-fill"></i> Select Student from Batch Roster:
+            </label>
+            <select id="student_select" class="form-select" style="font-size: 1.05rem; font-weight: 700; padding: 12px; border: 2px solid var(--primary); background: white;">
+                <option value="">-- Choose a Student from the List ({{ students|length }} Students Available) --</option>
+                {% for s in students %}
+                <option value="{{ s.student_name }}"
+                        data-name="{{ s.student_name }}"
+                        data-usn="{{ s.usn }}"
+                        data-att="{{ s.attendance_percentage }}"
+                        data-em3="{{ s.eng_math_3 }}"
+                        data-ds="{{ s.data_structures }}"
+                        data-dl="{{ s.digital_logic }}"
+                        data-oop="{{ s.oop_java }}"
+                        data-dm="{{ s.discrete_math }}"
+                        data-dbms="{{ s.dbms }}"
+                        data-os="{{ s.operating_systems }}"
+                        data-cn="{{ s.computer_networks }}"
+                        data-daa="{{ s.design_analysis_algo }}"
+                        data-se="{{ s.software_engineering }}"
+                        {% if loop.first %}selected{% endif %}>
+                    {{ s.student_name }} &mdash; USN: {{ s.usn }} (Attendance: {{ s.attendance_percentage }}%)
+                </option>
+                {% endfor %}
+            </select>
+            <div style="font-size: 0.85rem; color: var(--slate); margin-top: 6px;">
+                <i class="bi bi-info-circle"></i> Selecting a student will automatically populate their verified past 2 semesters marks below.
+            </div>
         </div>
 
         <form id="predict-form" action="{{ url_for('form') }}" method="POST">
-            <!-- Section 1: Demographics -->
+            <!-- Student Header Profile Banner -->
+            <div id="student-banner" style="background: white; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-sm);">
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Selected Student</span>
+                    <h3 id="display-name" style="font-size: 1.3rem; font-weight: 800; color: var(--dark); margin: 2px 0;">Aarav Sharma</h3>
+                    <span id="display-usn" style="font-size: 0.9rem; font-weight: 600; color: var(--primary);">USN: 1MS22CS001</span>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Overall Attendance</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="display-att-badge" style="font-size: 1.1rem; font-weight: 800; color: #166534; background: #dcfce7; padding: 4px 12px; border-radius: 999px;">
+                            92.0%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Inputs for Form Submission -->
+            <input type="hidden" name="student_name" id="student_name" value="Aarav Sharma">
+            <input type="hidden" name="usn" id="usn" value="1MS22CS001">
+
+            <!-- Attendance Adjustment Slider -->
             <div class="form-section">
                 <div class="section-legend">
-                    <i class="bi bi-person-badge"></i> 1. Demographic &amp; Background Profile
+                    <i class="bi bi-calendar-check"></i> Overall Academic Attendance (%)
+                </div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <input type="range" id="attendance_range" class="score-range" min="40" max="100" value="92">
+                        <input type="number" id="attendance_percentage" name="attendance_percentage" class="form-control score-number" min="0" max="100" step="0.5" value="92.0" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Semester 3 Core Subjects (5 subjects) -->
+            <div class="form-section">
+                <div class="section-legend" style="color: var(--primary);">
+                    <i class="bi bi-1-circle-fill"></i> Semester 3 Core Engineering Subjects (Marks out of 100)
                 </div>
                 
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label class="form-label" for="gender">Gender</label>
-                        <select name="gender" id="gender" class="form-select" required>
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
+                        <label class="form-label" for="eng_math_3">Engineering Mathematics III</label>
+                        <input type="number" name="eng_math_3" id="eng_math_3" class="form-control" min="0" max="100" step="0.5" value="88.0" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="ethnicity">Race / Ethnicity Group</label>
-                        <select name="ethnicity" id="ethnicity" class="form-select" required>
-                            <option value="">Select Group</option>
-                            <option value="group A">Group A</option>
-                            <option value="group B">Group B</option>
-                            <option value="group C">Group C</option>
-                            <option value="group D">Group D</option>
-                            <option value="group E">Group E</option>
-                        </select>
+                        <label class="form-label" for="data_structures">Data Structures &amp; Algorithms</label>
+                        <input type="number" name="data_structures" id="data_structures" class="form-control" min="0" max="100" step="0.5" value="91.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="digital_logic">Digital Logic Design &amp; Arch.</label>
+                        <input type="number" name="digital_logic" id="digital_logic" class="form-control" min="0" max="100" step="0.5" value="85.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="oop_java">OOP with Java / C++</label>
+                        <input type="number" name="oop_java" id="oop_java" class="form-control" min="0" max="100" step="0.5" value="90.0" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="parental_level_of_education">Parental Level of Education</label>
-                    <select name="parental_level_of_education" id="parental_level_of_education" class="form-select" required>
-                        <option value="">Select Education Level</option>
-                        <option value="some high school">Some High School</option>
-                        <option value="high school">High School</option>
-                        <option value="some college">Some College</option>
-                        <option value="associate's degree">Associate's Degree</option>
-                        <option value="bachelor's degree">Bachelor's Degree</option>
-                        <option value="master's degree">Master's Degree</option>
-                    </select>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label" for="discrete_math">Discrete Mathematical Structures</label>
+                    <input type="number" name="discrete_math" id="discrete_math" class="form-control" min="0" max="100" step="0.5" value="86.0" required>
                 </div>
             </div>
 
-            <!-- Section 2: Socio-Economic Factors -->
+            <!-- Section 2: Semester 4 Core Subjects (5 subjects) -->
             <div class="form-section">
-                <div class="section-legend">
-                    <i class="bi bi-card-checklist"></i> 2. Academic Support &amp; Nutrition
+                <div class="section-legend" style="color: var(--secondary);">
+                    <i class="bi bi-2-circle-fill"></i> Semester 4 Core Engineering Subjects (Marks out of 100)
                 </div>
 
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label class="form-label" for="lunch">Lunch Subsidy Status</label>
-                        <select name="lunch" id="lunch" class="form-select" required>
-                            <option value="">Select Status</option>
-                            <option value="standard">Standard Lunch</option>
-                            <option value="free/reduced">Free / Reduced Lunch</option>
-                        </select>
+                        <label class="form-label" for="dbms">Database Management Systems</label>
+                        <input type="number" name="dbms" id="dbms" class="form-control" min="0" max="100" step="0.5" value="89.0" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="test_preparation_course">Test Preparation Course</label>
-                        <select name="test_preparation_course" id="test_preparation_course" class="form-select" required>
-                            <option value="">Select Status</option>
-                            <option value="none">None (Incomplete)</option>
-                            <option value="completed">Completed</option>
-                        </select>
+                        <label class="form-label" for="operating_systems">Operating Systems</label>
+                        <input type="number" name="operating_systems" id="operating_systems" class="form-control" min="0" max="100" step="0.5" value="87.0" required>
                     </div>
-                </div>
-            </div>
 
-            <!-- Section 3: Assessment Metrics -->
-            <div class="form-section">
-                <div class="section-legend">
-                    <i class="bi bi-graph-up-arrow"></i> 3. Prior Academic Scores (0 - 100)
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="computer_networks">Computer Networks</label>
+                        <input type="number" name="computer_networks" id="computer_networks" class="form-control" min="0" max="100" step="0.5" value="88.0" required>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="reading_score">Reading Assessment Score</label>
-                    <div class="slider-container">
-                        <input type="range" id="reading_range" class="score-range" min="0" max="100" value="70">
-                        <input type="number" id="reading_score" name="reading_score" class="form-control score-number" min="0" max="100" value="70" required>
+                    <div class="form-group">
+                        <label class="form-label" for="design_analysis_algo">Design &amp; Analysis of Algo (DAA)</label>
+                        <input type="number" name="design_analysis_algo" id="design_analysis_algo" class="form-control" min="0" max="100" step="0.5" value="92.0" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="writing_score">Writing Assessment Score</label>
-                    <div class="slider-container">
-                        <input type="range" id="writing_range" class="score-range" min="0" max="100" value="70">
-                        <input type="number" id="writing_score" name="writing_score" class="form-control score-number" min="0" max="100" value="70" required>
-                    </div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label" for="software_engineering">Software Engineering &amp; Agile</label>
+                    <input type="number" name="software_engineering" id="software_engineering" class="form-control" min="0" max="100" step="0.5" value="90.0" required>
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" id="submit-btn" class="btn btn-primary btn-block">
-                <i class="bi bi-lightning-charge-fill"></i> Generate Math Performance Prediction
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-block" style="padding: 16px; font-size: 1.1rem;">
+                <i class="bi bi-lightning-charge-fill"></i> Run ML Performance Forecast for this Student
             </button>
         </form>
     </div>

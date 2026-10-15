@@ -29,35 +29,48 @@ class PredictPipeline:
 
 class CustomData:
     def __init__(self,
-                 gender: str,
-                 race_ethnicity: str,
-                 parental_level_of_education: str,
-                 lunch: str,
-                 test_preparation_course: str,
-                 reading_score,
-                 writing_score):
+                 eng_math_3,
+                 data_structures,
+                 digital_logic,
+                 oop_java,
+                 discrete_math,
+                 dbms,
+                 operating_systems,
+                 computer_networks,
+                 design_analysis_algo,
+                 software_engineering,
+                 attendance_percentage=85.0):
 
-        self.gender = gender
-        self.race_ethnicity = race_ethnicity
-        self.parental_level_of_education = parental_level_of_education
-        self.lunch = lunch
-        self.test_preparation_course = test_preparation_course
-        self.reading_score = reading_score
-        self.writing_score = writing_score
+        self.eng_math_3 = eng_math_3
+        self.data_structures = data_structures
+        self.digital_logic = digital_logic
+        self.oop_java = oop_java
+        self.discrete_math = discrete_math
+        self.dbms = dbms
+        self.operating_systems = operating_systems
+        self.computer_networks = computer_networks
+        self.design_analysis_algo = design_analysis_algo
+        self.software_engineering = software_engineering
+        self.attendance_percentage = attendance_percentage
 
     def get_data_as_data_frame(self):
         try:
             custom_data_input_dict = {
-                "gender": [self.gender],
-                "race_ethnicity": [self.race_ethnicity],
-                "parental_level_of_education": [self.parental_level_of_education],
-                "lunch": [self.lunch],
-                "test_preparation_course": [self.test_preparation_course],
-                "reading_score": [int(self.reading_score)],
-                "writing_score": [int(self.writing_score)],
+                "attendance_percentage": [float(self.attendance_percentage)],
+                "eng_math_3": [float(self.eng_math_3)],
+                "data_structures": [float(self.data_structures)],
+                "digital_logic": [float(self.digital_logic)],
+                "oop_java": [float(self.oop_java)],
+                "discrete_math": [float(self.discrete_math)],
+                "dbms": [float(self.dbms)],
+                "operating_systems": [float(self.operating_systems)],
+                "computer_networks": [float(self.computer_networks)],
+                "design_analysis_algo": [float(self.design_analysis_algo)],
+                "software_engineering": [float(self.software_engineering)],
             }
 
             return pd.DataFrame(custom_data_input_dict)
 
         except Exception as e:
             raise CustomException(e, sys)
+
