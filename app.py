@@ -72,10 +72,10 @@ def dashboard():
         attendance_avg = 0.0
 
     faculty = {
-        "name": "Prof. Srajan Gowda",
+        "name": "Prof. Demo Name",
         "title": "Associate Professor & Senior Academic Mentor",
         "department": "Department of Computer Science & Engineering",
-        "email": "srajan.gowda@engg.edu",
+        "email": "demo.faculty@engg.edu",
         "office": "Room 408, CS Academic Block",
         "course": "B.Tech CSE Batch 2022-26",
         "term": "Academic Year 2025–26 (Semesters III & IV Review)"
